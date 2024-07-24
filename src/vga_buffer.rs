@@ -2,7 +2,7 @@
  * @Author: 0xSchnappi 952768182@qq.com
  * @Date: 2024-07-24 10:18:45
  * @LastEditors: 0xSchnappi 952768182@qq.com
- * @LastEditTime: 2024-07-24 20:57:08
+ * @LastEditTime: 2024-07-24 21:26:15
  * @FilePath: /rust-os/src/vga_buffer.rs
  * @Description:
  *
@@ -78,6 +78,18 @@ pub struct Writer {
     buffer: &'static mut Buffer,
 }
 
+// 全局接口
+// 使用全局静态变量
+use lazy_static::lazy_static; // 延迟初始化  目的是为了解决编译期初始化常量求值器和常函数问题
+use spin::Mutex; // RefCell UnsafeCell 是非i同步类型，不满足Sync，所以这里使用自旋锁解决
+lazy_static! {
+    pub static ref WRITE: Mutex<Writer> = Mutex::new(Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    });
+}
+
 impl Writer {
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
@@ -143,16 +155,11 @@ impl fmt::Write for Writer {
     }
 }
 
-pub fn print_something() {
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    };
+// pub fn print_something() {
 
-    writer.write_byte(b'H');
-    writer.write_string("elo ");
-    writer.write_string("world");
-    use core::fmt::Write;
-    write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
-}
+//     writer.write_byte(b'H');
+//     writer.write_string("elo ");
+//     writer.write_string("world");
+//     use core::fmt::Write;
+//     write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
+// }

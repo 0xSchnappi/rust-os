@@ -2,7 +2,7 @@
  * @Author: 0xSchnappi 952768182@qq.com
  * @Date: 2024-07-17 09:40:07
  * @LastEditors: 0xSchnappi 952768182@qq.com
- * @LastEditTime: 2024-07-24 20:14:51
+ * @LastEditTime: 2024-07-24 21:19:56
  * @FilePath: /rust-os/src/main.rs
  * @Description: main
  *
@@ -37,6 +37,10 @@ pub extern "C" fn _start() -> ! {
     //         *vag_buffer.offset(i as isize * 2 + 1) = 0xb; // 0xb代表淡青色
     //     }
     // }
-    vga_buffer::print_something();
+
+    use core::fmt::Write;
+    vga_buffer::WRITE.lock().write_str("Hello again").unwrap();
+    write!(vga_buffer::WRITE.lock(), ", some number:{} {}", 42, 1.337).unwrap();
+
     loop {}
 }
