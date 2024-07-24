@@ -2,7 +2,7 @@
  * @Author: 0xSchnappi 952768182@qq.com
  * @Date: 2024-07-24 10:18:45
  * @LastEditors: 0xSchnappi 952768182@qq.com
- * @LastEditTime: 2024-07-24 20:21:36
+ * @LastEditTime: 2024-07-24 20:57:08
  * @FilePath: /rust-os/src/vga_buffer.rs
  * @Description:
  *
@@ -113,7 +113,24 @@ impl Writer {
     }
 
     pub fn new_line(&mut self) {
-        todo!()
+        // 将VGA矩阵所有行向上移动
+        for row in 1..BUFFER_HEIGHT {
+            for col in 0..BUFFER_WIDTH {
+                let character = self.buffer.chars[row][col].read();
+                self.buffer.chars[row - 1][col].write(character);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1); // 最后一行清除
+        self.column_position = 0; // 重置列位置最后一个到第一个
+    }
+
+    pub fn clear_row(&mut self, row: usize) {
+        for col in 0..BUFFER_WIDTH {
+            self.buffer.chars[row][col].write(ScreenChar {
+                ascii_character: b' ',
+                color_code: self.color_code,
+            });
+        }
     }
 }
 
