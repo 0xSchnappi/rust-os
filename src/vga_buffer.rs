@@ -2,7 +2,7 @@
  * @Author: 0xSchnappi 952768182@qq.com
  * @Date: 2024-07-24 10:18:45
  * @LastEditors: 0xSchnappi 952768182@qq.com
- * @LastEditTime: 2024-07-24 20:14:21
+ * @LastEditTime: 2024-07-24 20:21:36
  * @FilePath: /rust-os/src/vga_buffer.rs
  * @Description:
  *
@@ -117,6 +117,15 @@ impl Writer {
     }
 }
 
+use core::fmt;
+
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
+}
+
 pub fn print_something() {
     let mut writer = Writer {
         column_position: 0,
@@ -127,4 +136,6 @@ pub fn print_something() {
     writer.write_byte(b'H');
     writer.write_string("elo ");
     writer.write_string("world");
+    use core::fmt::Write;
+    write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
 }
