@@ -2,7 +2,7 @@
  * @Author: 0xSchnappi 952768182@qq.com
  * @Date: 2024-07-24 10:18:45
  * @LastEditors: 0xSchnappi 952768182@qq.com
- * @LastEditTime: 2024-07-25 19:22:17
+ * @LastEditTime: 2024-07-25 19:30:17
  * @FilePath: /rust-os/src/vga_buffer.rs
  * @Description:
  *
@@ -147,7 +147,7 @@ impl Writer {
 }
 
 use core::fmt;
-
+// 想使用Write的相关函数，只需要实现write_str函数就行，是他write_char、write_fmt等函数的底层函数调用write_str,
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
@@ -170,7 +170,7 @@ impl fmt::Write for Writer {
 // 而不是通过 std::macros::println。但是它会占用包的根命名空间(root namespace)
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));      // TODO 补充宏编程资料
 }
 
 #[macro_export]

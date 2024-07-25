@@ -2,7 +2,7 @@
  * @Author: 0xSchnappi 952768182@qq.com
  * @Date: 2024-07-17 09:40:07
  * @LastEditors: 0xSchnappi 952768182@qq.com
- * @LastEditTime: 2024-07-25 19:18:40
+ * @LastEditTime: 2024-07-25 19:25:03
  * @FilePath: /rust-os/src/main.rs
  * @Description: main
  *
@@ -17,7 +17,8 @@ mod vga_buffer;
 
 // 这个函数将在panic时调用
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    println!("{}", info);
     loop {}
 }
 
@@ -42,6 +43,7 @@ pub extern "C" fn _start() -> ! {
     // vga_buffer::WRITE.lock().write_str("Hello again").unwrap();
     // write!(vga_buffer::WRITE.lock(), ", some number:{} {}", 42, 1.337).unwrap();
     println!("Hello World{}", "!");
+    panic!("print panic");
 
     loop {}
 }
