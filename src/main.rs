@@ -2,7 +2,7 @@
  * @Author: 0xSchnappi 952768182@qq.com
  * @Date: 2024-07-17 09:40:07
  * @LastEditors: 0xSchnappi 952768182@qq.com
- * @LastEditTime: 2024-07-25 19:25:03
+ * @LastEditTime: 2024-07-25 21:26:36
  * @FilePath: /rust-os/src/main.rs
  * @Description: main
  *
@@ -10,6 +10,25 @@
  */
 #![no_std]
 #![no_main]
+// 自定义单元测试
+#![feature(custom_test_frameworks)]
+#![test_runner(crate::test_runner)]
+#![reexport_test_harness_main = "test_main"] // 没有解决使用panic = "abort" 情况cargo test报错duplicate langitem问题
+
+#[cfg(test)]
+pub fn test_runner(tests: &[&dyn Fn()]) {
+    println!("Runing {} tests", tests.len());
+    for test in tests {
+        test();
+    }
+}
+
+#[test_case]
+fn trivial_assertion() {
+    println!("trivial assertion... ");
+    assert_eq!(1, 1);
+    println!("[ok]");
+}
 
 use core::panic::PanicInfo;
 
@@ -43,7 +62,10 @@ pub extern "C" fn _start() -> ! {
     // vga_buffer::WRITE.lock().write_str("Hello again").unwrap();
     // write!(vga_buffer::WRITE.lock(), ", some number:{} {}", 42, 1.337).unwrap();
     println!("Hello World{}", "!");
-    panic!("print panic");
+    // panic!("print panic");
+
+    #[cfg(test)]
+    test_main();
 
     loop {}
 }
