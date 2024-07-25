@@ -2,7 +2,7 @@
  * @Author: 0xSchnappi 952768182@qq.com
  * @Date: 2024-07-24 10:18:45
  * @LastEditors: 0xSchnappi 952768182@qq.com
- * @LastEditTime: 2024-07-24 21:26:15
+ * @LastEditTime: 2024-07-25 19:22:17
  * @FilePath: /rust-os/src/vga_buffer.rs
  * @Description:
  *
@@ -163,3 +163,24 @@ impl fmt::Write for Writer {
 //     use core::fmt::Write;
 //     write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
 // }
+
+// 在每个使用的 print! 宏前面添加了 $crate 变量。这样我们在只需要使用 println! 时，不必也编写代码导入 print! 宏
+// #[macro_export] 属性让整个包（crate）和基于它的包都能访问这个宏，而不仅限于定义它的模块（module）。
+// 它还将把宏置于包的根模块（crate root）下，这意味着比如我们需要通过 use std::println 来导入这个宏，
+// 而不是通过 std::macros::println。但是它会占用包的根命名空间(root namespace)
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)))
+}
+
+#[doc(hidden)]
+pub fn _print(args: fmt::Arguments) {
+    use core::fmt::Write;
+    WRITE.lock().write_fmt(args).unwrap();
+}
